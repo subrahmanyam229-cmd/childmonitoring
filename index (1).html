@@ -1,0 +1,80 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+    body {
+        background-image: url('bgiimage.png');
+        background-size: cover;
+    }
+
+    .container {
+        max-width: 500px;
+        margin-top: 20px;
+        margin-left: 60px;
+    }
+
+    #qrcode {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+    }
+</style>
+
+<h1>
+    <marquee scrollamount="10">2k27 GODAVARI PUSKARALU </marquee>
+</h1>
+<div class="container">
+    <div class="card shadow p-4">
+        <h3 class="text-center mb-4">Child monitoring</h3>
+
+        <div class="mb-3">
+            <label class="form-label">Child Name</label>
+            <input type="text" id="childName" class="form-control" placeholder="Enter Child Name">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Parent Name</label>
+            <input type="text" id="parentName" class="form-control" placeholder="Enter Parent Name">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Mobile Number</label>
+            <input type="number" id="mobile" class="form-control" placeholder="Enter Mobile Number">
+        </div>
+
+        <button class="btn btn-primary w-100" onclick="generateQR()">
+            Generate QR Code
+        </button>
+
+        <div id="qrcode"></div>
+        <i>scan for details</i>
+    </div>
+</div>
+
+<script>
+    function generateQR() {
+
+        let child = document.getElementById("childName").value.trim();
+        let parent = document.getElementById("parentName").value.trim();
+        let mobile = document.getElementById("mobile").value.trim();
+
+        if (child === "" || parent === "" || mobile === "") {
+            alert("Please fill all fields.");
+            return;
+        }
+
+        let data =
+            `Child Name: ${child}
+Parent Name: ${parent}
+Mobile Number: ${mobile}`;
+        document.getElementById("qrcode").innerHTML = "";
+
+        new QRCode(document.getElementById("qrcode"), {
+            text: data,
+            width: 220,
+            height: 220
+        });
+    }
+</script>
