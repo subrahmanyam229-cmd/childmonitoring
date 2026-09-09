@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediConnect - Online Medical Appointments</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .appointment-form {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-lg fixed w-full top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-heartbeat text-blue-600 text-2xl mr-2"></i>
+                        <span class="text-xl font-bold text-gray-800">MediConnect</span>
+                    </div>
+                    <div class="hidden md:ml-6 md:flex md:space-x-8">
+                        <button onclick="showPage('home')" class="text-blue-600 border-b-2 border-blue-600 px-3 py-2 text-sm font-medium">Home</button>
+                        <button onclick="showPage('features')" class="text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium">Features</button>
+                        <button onclick="showPage('reports')" class="text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium">Reports</button>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <div id="user-section" class="hidden">
+                        <span class="text-gray-700 mr-4" id="username-display"></span>
+                        <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                            <i class="fas fa-sign-out-alt mr-1"></i>Logout
+                        </button>
+                    </div>
+                    <button id="login-btn" onclick="showPage('login')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                        <i class="fas fa-user mr-1"></i>Login
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="pt-16">
+        <!-- Home Page -->
+        <div id="home" class="page active">
+            <!-- Hero Section -->
+            <div class="gradient-bg text-white">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+                    <div class="grid md:grid-cols-2 gap-12 items-center">
+                        <div>
+                            <h1 class="text-4xl md:text-5xl font-bold mb-6">Your Health, Our Priority</h1>
+                            <p class="text-xl mb-8 opacity-90">Book appointments with top doctors instantly. Get the care you deserve from the comfort of your home.</p>
+                            <button onclick="scrollToAppointment()" class="bg-white text-blue-600 px-8 py-3 rounded-full font-semibold text-lg hover:bg-gray-100 transition duration-300">
+                                <i class="fas fa-calendar-check mr-2"></i>Quick Appointment
+                            </button>
+                        </div>
+                        <div class="flex justify-center">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/cd02c0b3-c3e4-4d26-baf2-fc65b5b1e66b.png" alt="Modern healthcare professionals in a clinic setting with medical equipment and smiling doctors" class="rounded-lg shadow-2xl" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Appointment Section -->
+            <div id="appointment-section" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+                <div class="bg-white rounded-2xl shadow-xl p-8 appointment-form">
+                    <h2 class="text-3xl font-bold text-white mb-8 text-center">Book Your Appointment Now</h2>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="text-white font-semibold mb-2 block">Full Name</label>
+                            <input type="text" id="patient-name" class="w-full px-4 py-3 rounded-lg bg-white bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your full name">
+                        </div>
+                        <div>
+                            <label class="text-white font-semibold mb-2 block">Phone Number</label>
+                            <input type="tel" id="patient-phone" class="w-full px-4 py-3 rounded-lg bg-white bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your phone number">
+                        </div>
+                        <div>
+                            <label class="text-white font-semibold mb-2 block">Specialization</label>
+                            <select id="specialization" class="w-full px-4 py-3 rounded-lg bg-white bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Select Specialization</option>
+                                <option value="cardiology">Cardiology</option>
+                                <option value="neurology">Neurology</option>
+                                <option value="pediatrics">Pediatrics</option>
+                                <option value="orthopedics">Orthopedics</option>
+                                <option value="dermatology">Dermatology</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-white font-semibold mb-2 block">Preferred Date</label>
+                            <input type="date" id="appointment-date" class="w-full px-4 py-3 rounded-lg bg-white bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <label class="text-white font-semibold mb-2 block">Additional Notes</label>
+                        <textarea id="appointment-notes" rows="3" class="w-full px-4 py-3 rounded-lg bg-white bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Any specific concerns or requirements..."></textarea>
+                    </div>
+                    <div class="text-center mt-8">
+                        <button onclick="bookAppointment()" class="bg-blue-600 hover:bg-blue-700 text-white px-12 py-4 rounded-full font-semibold text-lg transition duration-300">
+                            <i class="fas fa-paper-plane mr-2"></i>Confirm Appointment
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Section -->
+            <div class="bg-white py-16">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                        <div class="p-6">
+                            <div class="text-3xl font-bold text-blue-600 mb-2">10K+</div>
+                            <div class="text-gray-600">Happy Patients</div>
+                        </div>
+                        <div class="p-6">
+                            <div class="text-3xl font-bold text-blue-600 mb-2">200+</div>
+                            <div class="text-gray-600">Expert Doctors</div>
+                        </div>
+                        <div class="p-6">
+                            <div class="text-3xl font-bold text-blue-600 mb-2">24/7</div>
+                            <div class="text-gray-600">Support Available</div>
+                        </div>
+                        <div class="p-6">
+                            <div class="text-3xl font-bold text-blue-600 mb-2">99%</div>
+                            <div class="text-gray-600">Satisfaction Rate</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Page -->
+        <div id="features" class="page">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+                <h2 class="text-4xl font-bold text-center text-gray-800 mb-16">Our Features</h2>
+                
+                <div class="grid md:grid-cols-3 gap-8">
+                    <!-- Feature 1 -->
+                    <div class="bg-white p-8 rounded-2xl shadow-lg card-hover">
+                        <div class="text-blue-600 text-4xl mb-4">
+                            <i class="fas fa-video"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-4">Video Consultations</h3>
+                        <p class="text-gray-600">Connect with doctors through secure video calls from anywhere, anytime.</p>
+                    </div>
+
+                    <!-- Feature 2 -->
+                    <div class="bg-white p-8 rounded-2xl shadow-lg card-hover">
+                        <div class="text-blue-600 text-4xl mb-4">
+                            <i class="fas fa-prescription-bottle"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-4">E-Prescriptions</h3>
+                        <p class="text-gray-600">Get digital prescriptions delivered instantly to your preferred pharmacy.</p>
+                    </div>
+
+                    <!-- Feature 3 -->
+                    <div class="bg-white p-8 rounded-2xl shadow-lg card-hover">
+                        <div class="text-blue-600 text-4xl mb-4">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-4">Smart Scheduling</h3>
+                        <p class="text-gray-600">Intelligent appointment scheduling that finds the perfect time for you.</p>
+                    </div>
+
+                    <!-- Feature 4 -->
+                    <div class="bg-white p-8 rounded-2xl shadow-lg card-hover">
+                        <div class="text-blue-600 text-4xl mb-4">
+                            <i class="fas fa-file-medical"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-4">Health Records</h3>
+                        <p class="text-gray-600">Access your complete medical history and records securely online.</p>
+                    </div>
+
+                    <!-- Feature 5 -->
+                    <div class="bg-white p-8 rounded-2xl shadow-lg card-hover">
+                        <div class="text-blue-600 text-4xl mb-4">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-4">Smart Reminders</h3>
+                        <p class="text-gray-600">Never miss an appointment with intelligent reminder systems.</p>
+                    </div>
+
+                    <!-- Feature 6 -->
+                    <div class="bg-white p-8 rounded-2xl shadow-lg card-hover">
+                        <div class="text-blue-600 text-4xl mb-4">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-4">Secure Platform</h3>
+                        <p class="text-gray-600">Bank-level security to protect your health information and privacy.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Page -->
+        <div id="reports" class="page">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+                <h2 class="text-4xl font-bold text-center text-gray-800 mb-8">Medical Reports</h2>
+                <p class="text-center text-gray-600 mb-12">Access and manage your medical reports securely</p>
+
+                <div class="bg-white rounded-2xl shadow-lg p-8">
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Report Card 1 -->
+                        <div class="border border-gray-200 rounded-lg p-6 card-hover">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-semibold text-gray-800">Blood Test Results</h3>
+                                <span class="bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">Completed</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-4">Date: Dec 15, 2023</p>
+                            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm">
+                                <i class="fas fa-download mr-2"></i>Download Report
+                            </button>
+                        </div>
+
+                        <!-- Report Card 2 -->
+                        <div class="border border-gray-200 rounded-lg p-6 card-hover">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-semibold text-gray-800">X-Ray Report</h3>
+                                <span class="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">Pending</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-4">Date: Dec 18, 2023</p>
+                            <button class="w-full bg-gray-200 text-gray-600 py-2 px-4 rounded-lg text-sm cursor-not-allowed">
+                                <i class="fas fa-clock mr-2"></i>Processing
+                            </button>
+                        </div>
+
+                        <!-- Report Card 3 -->
+                        <div class="border border-gray-200 rounded-lg p-6 card-hover">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-semibold text-gray-800">ECG Analysis</h3>
+                                <span class="bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">Completed</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-4">Date: Dec 10, 2023</p>
+                            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm">
+                                <i class="fas fa-download mr-2"></i>Download Report
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mt-12 text-center">
+                        <h3 class="text-2xl font-semibold text-gray-800 mb-4">Upload New Report</h3>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-8">
+                            <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                            <p class="text-gray-600 mb-4">Drag and drop your medical reports here or</p>
+                            <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg">
+                                <i class="fas fa-upload mr-2"></i>Browse Files
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Login Page -->
+        <div id="login" class="page">
+            <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+                <div class="max-w-md w-full space-y-8 bg-white p-10 rounded-2xl shadow-xl">
+                    <div>
+                        <div class="mx-auto h-12 w-12 bg-blue-600 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user-md text-white text-xl"></i>
+                        </div>
+                        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                            Sign in to your account
+                        </h2>
+                    </div>
+                    <form class="mt-8 space-y-6" onsubmit="handleLogin(event)">
+                        <div class="rounded-md shadow-sm -space-y-px">
+                            <div>
+                                <label for="email" class="sr-only">Email address</label>
+                                <input id="email" name="email" type="email" required class="appearance-none rounded-t-lg relative block w-full px-3 py-4 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" placeholder="Email address">
+                            </div>
+                            <div>
+                                <label for="password" class="sr-only">Password</label>
+                                <input id="password" name="password" type="password" required class="appearance-none rounded-b-lg relative block w-full px-3 py-4 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" placeholder="Password">
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="remember-me" class="ml-2 block text-sm text-gray-900">
+                                    Remember me
+                                </label>
+                            </div>
+
+                            <div class="text-sm">
+                                <a href="#" class="font-medium text-blue-600 hover:text-blue-500">
+                                    Forgot your password?
+                                </a>
+                            </div>
+                        </div>
+
+                        <div>
+                            <button type="submit" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                                Sign in
+                            </button>
+                        </div>
+
+                        <div class="text-center">
+                            <p class="text-sm text-gray-600">
+                                Don't have an account? 
+                                <a href="#" class="font-medium text-blue-600 hover:text-blue-500">
+                                    Sign up now
+                                </a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">MediConnect</h3>
+                    <p class="text-gray-400">Your trusted partner in healthcare. Connecting patients with doctors seamlessly.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Services</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Doctors</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Help Center</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">FAQs</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Contact Info</h4>
+                    <div class="space-y-2 text-gray-400">
+                        <p><i class="fas fa-phone mr-2"></i>+1 (555) 123-4567</p>
+                        <p><i class="fas fa-envelope mr-2"></i>support@mediconnect.com</p>
+                        <p><i class="fas fa-map-marker-alt mr-2"></i>123 Health St, Medical City</p>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>© 2023 MediConnect. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Check if user is logged in
+        function checkLoginStatus() {
+            const user = localStorage.getItem('currentUser');
+            if (user) {
+                const userData = JSON.parse(user);
+                document.getElementById('user-section').classList.remove('hidden');
+                document.getElementById('login-btn').classList.add('hidden');
+                document.getElementById('username-display').textContent = `Welcome, ${userData.name}`;
+            }
+        }
+
+        // Show specific page
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        // Handle login form submission
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // Simple validation (in real app, this would connect to backend)
+            if (email && password) {
+                // Simulate successful login
+                const userData = {
+                    email: email,
+                    name: email.split('@')[0],
+                    loginTime: new Date().toISOString()
+                };
+                
+                localStorage.setItem('currentUser', JSON.stringify(userData));
+                checkLoginStatus();
+                showPage('home');
+                
+                // Show success message
+                alert('Login successful! Welcome to MediConnect.');
+            } else {
+                alert('Please enter both email and password.');
+            }
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('currentUser');
+            document.getElementById('user-section').classList.add('hidden');
+            document.getElementById('login-btn').classList.remove('hidden');
+            showPage('home');
+            alert('You have been logged out successfully.');
+        }
+
+        // Scroll to appointment section
+        function scrollToAppointment() {
+            document.getElementById('appointment-section').scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+
+        // Book appointment function
+        function bookAppointment() {
+            const name = document.getElementById('patient-name').value;
+            const phone = document.getElementById('patient-phone').value;
+            const specialization = document.getElementById('specialization').value;
+            const date = document.getElementById('appointment-date').value;
+            
+            if (!name || !phone || !specialization || !date) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            alert(`Appointment booked successfully!\n\nName: ${name}\nPhone: ${phone}\nSpecialization: ${specialization}\nDate: ${date}`);
+            
+            // Reset form
+            document.getElementById('patient-name').value = '';
+            document.getElementById('patient-phone').value = '';
+            document.getElementById('specialization').value = '';
+            document.getElementById('appointment-date').value = '';
+            document.getElementById('appointment-notes').value = '';
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+            
+            // Set minimum date for appointment to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('appointment-date').min = today;
+        });
+    </script>
+</body>
+</html>
